@@ -5,13 +5,51 @@ const Button = ({ handleClick, text }) => (
   <button onClick={handleClick}>{text}</button>
 );
 
-const Display = ({ text, value }) => (
-  <p>
-    <span>{text}</span>
-    &nbsp;
-    <span>{value}</span>
-  </p>
+const Statistic = ({ text, value }) => (
+  <tr>
+    <td>{text}</td>
+    <td>{value}</td>
+  </tr>
 );
+
+const Statistics = ({ results }) => {
+  const [good, neutral, bad] = results;
+
+  const sum = results.reduce((a, b) => a + b);
+  // If there are no votes, then there's no feedback.
+  if (sum === 0) {
+    return (
+      <>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </>
+    );
+  }
+
+  const average = sum / results.length;
+  const positivePercentage = (good / sum) * 100;
+  const displayedPercentage = isNaN(positivePercentage)
+    ? 0
+    : positivePercentage;
+
+  return (
+    <>
+      <h1>statistics</h1>
+      <table>
+        <tbody>
+          <Statistic text="good" value={good}></Statistic>
+          <Statistic text="neutral" value={neutral}></Statistic>
+          <Statistic text="bad" value={bad}></Statistic>
+          <Statistic text="average" value={average}></Statistic>
+          <Statistic
+            text="positive"
+            value={displayedPercentage + "%"}
+          ></Statistic>
+        </tbody>
+      </table>
+    </>
+  );
+};
 
 const GiveFeedback = ({ feedback }) => {
   const plusFeedback = (type) => () => {
@@ -24,28 +62,6 @@ const GiveFeedback = ({ feedback }) => {
       <Button handleClick={plusFeedback("good")} text="good"></Button>
       <Button handleClick={plusFeedback("neutral")} text="neutral"></Button>
       <Button handleClick={plusFeedback("bad")} text="bad"></Button>
-    </>
-  );
-};
-
-const Statistics = ({ results }) => {
-  const [good, neutral, bad] = results;
-
-  const sum = results.reduce((a, b) => a + b);
-  const average = sum / results.length;
-  const positivePercentage = (good / sum) * 100;
-  const displayedPercentage = isNaN(positivePercentage)
-    ? 0
-    : positivePercentage;
-
-  return (
-    <>
-      <h1>statistics</h1>
-      <Display text="good" value={good}></Display>
-      <Display text="neutral" value={neutral}></Display>
-      <Display text="bad" value={bad}></Display>
-      <Display text="average" value={average}></Display>
-      <Display text="positive" value={displayedPercentage + "%"}></Display>
     </>
   );
 };
