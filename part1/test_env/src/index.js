@@ -1,25 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
-const Hello = (props) => {
+const Display = ({ value }) => <div>{value}</div>;
+
+const Button = ({ handleClick, text }) => (
+  <button onClick={handleClick}>{text}</button>
+);
+
+const App = (props) => {
+  const [value, setValue] = useState(10);
+
+  const setToValue = (newValue) => () => setValue(newValue);
+
   return (
     <div>
-      <p>
-        Hello {props.name}, you are {props.age} years old
-      </p>
+      <Display value={value}></Display>
+      <Button handleClick={setToValue(1000)} text="thousand"></Button>
+      <Button handleClick={setToValue(0)} text="reset" />
+      <Button handleClick={setToValue(value + 1)} text="increment" />
     </div>
-  );
-};
-
-const App = () => {
-  const name = "Peter";
-  const age = 10;
-  return (
-    <>
-      <h1>Greetings</h1>
-      <Hello name="George" age={26 + 10} />
-      <Hello name="Daisy" age={age} />
-    </>
   );
 };
 
