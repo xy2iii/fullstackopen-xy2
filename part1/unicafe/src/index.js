@@ -18,7 +18,6 @@ const GiveFeedback = ({ feedback }) => {
     const f = feedback[type];
     f.setState(f.state + 1);
   };
-
   return (
     <>
       <h1>give feedback</h1>
@@ -29,13 +28,24 @@ const GiveFeedback = ({ feedback }) => {
   );
 };
 
-const Statistics = ({ feedback }) => {
+const Statistics = ({ results }) => {
+  const [good, neutral, bad] = results;
+
+  const sum = results.reduce((a, b) => a + b);
+  const average = sum / results.length;
+  const positivePercentage = (good / sum) * 100;
+  const displayedPercentage = isNaN(positivePercentage)
+    ? 0
+    : positivePercentage;
+
   return (
     <>
       <h1>statistics</h1>
-      <Display text="good" value={feedback.good.state}></Display>
-      <Display text="neutral" value={feedback.neutral.state}></Display>
-      <Display text="bad" value={feedback.bad.state}></Display>
+      <Display text="good" value={good}></Display>
+      <Display text="neutral" value={neutral}></Display>
+      <Display text="bad" value={bad}></Display>
+      <Display text="average" value={average}></Display>
+      <Display text="positive" value={displayedPercentage + "%"}></Display>
     </>
   );
 };
@@ -60,10 +70,16 @@ const App = () => {
     },
   };
 
+  const results = [
+    feedback.good.state,
+    feedback.neutral.state,
+    feedback.bad.state,
+  ];
+
   return (
     <div>
       <GiveFeedback feedback={feedback}></GiveFeedback>
-      <Statistics feedback={feedback}></Statistics>
+      <Statistics results={results}></Statistics>
     </div>
   );
 };
