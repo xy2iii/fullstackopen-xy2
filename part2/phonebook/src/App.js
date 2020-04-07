@@ -9,6 +9,8 @@ const App = () => {
   ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [filter, setFilter] = useState('')
+  const [filteredView, setFilteredView] = useState(persons)
 
   const handleNewPerson = (event) => {
     event.preventDefault()
@@ -33,10 +35,16 @@ const App = () => {
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
   }
+  const handleFilter = (event) => {
+    setFilter(event.target.value)
+    setFilteredView(persons.filter((person) => person.name.includes(filter)))
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      filter shown with <input value={filter} onChange={handleFilter}></input>
+      <h2>Add a new</h2>
       <form onSubmit={handleNewPerson}>
         <div>
           <div>
@@ -52,7 +60,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {persons.map((person) => (
+        {filteredView.map((person) => (
           <li key={person.name}>
             {person.name} : {person.number}
           </li>
