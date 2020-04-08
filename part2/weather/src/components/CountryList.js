@@ -1,5 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Country from './Country'
+
+const ShowCountry = ({ country }) => {
+  const [active, setActive] = useState(false)
+
+  return (
+    <>
+      <li key={country.name}>{country.name}</li>
+      <button onClick={() => setActive(!active)}>Show country</button>
+      {active ? <Country country={country}> </Country> : <></>}
+    </>
+  )
+}
 
 const CountryList = ({ countries }) => {
   if (countries.length > 10) {
@@ -13,7 +25,7 @@ const CountryList = ({ countries }) => {
   return (
     <ul>
       {countries.map((country) => (
-        <li key={country.name}>{country.name}</li>
+        <ShowCountry key={country.name} country={country}></ShowCountry>
       ))}
     </ul>
   )
