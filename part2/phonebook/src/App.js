@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import numberService from './services/numbers'
+import personService from './services/numbers'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,27 +11,70 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   const hook = () => {
-    numberService.getAll().then(data => {
+    personService.getAll().then(data => {
       setPersons(data)
     })
   }
   useEffect(hook, [])
 
-  const handleNewPerson = event => {
+  const handleForm = event => {
     event.preventDefault()
     const names = persons.map(person => person.name)
+    let replacePhoneNumber = false
 
+    // Does the phone number already exist?
     if (names.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
+      replacePhoneNumber = window.confirm(
+        `${newName} is already in phonebook, replace number?`
+      )
+
+      if (replacePhoneNumber) {
+        const oldPerson = persons.filter(p => p.name === newName)[0]
+        const newPerson = {
+          ...oldPerson,
+          number: newNumber,
+        }
+
+        personService
+          .update(oldPerson.id, newPerson) // Server side.
+          .then(() => {
+            // Client side.
+            let newPersons = persons.slice()
+            const i = newPersons.findIndex(p => p.id === oldPerson.id)
+            newPersons[i] = newPerson
+            setPersons(newPersons)
+          })
+        return
+      } else {
+        // We don't replace the phone number, so exit.
+        return
+      }
     }
+
+    // It doens't, so create a new person instead.
     const newPerson = {
       name: newName,
       number: newNumber,
     }
-    setPersons(persons.concat(newPerson))
-    setNewName('')
-    setNewNumber('')
+    personService.create(newPerson).then(data => {
+      setPersons(persons.concat(data))
+      setNewName('')
+      setNewNumber('')
+    })
+  }
+
+  const handleRemoval = id => () => {
+    const person = persons.filter(p => p.id === id)[0]
+
+    const yes = window.confirm(`Delete ${person.name} ?`)
+    if (yes) {
+      personService
+        .remove(id) // Server side.
+        .then(() => {
+          // Client side.
+          setPersons(persons.filter(p => p.id !== id))
+        })
+    }
   }
 
   const handleNameChange = event => {
@@ -56,12 +99,12 @@ const App = () => {
       <PersonForm
         newName={newName}
         newNumber={newNumber}
-        handleNewPerson={handleNewPerson}
+        handleForm={handleForm}
         handleNameChange={handleNameChange}
         handleNumberChange={handleNumberChange}
       ></PersonForm>
       <h3>Numbers</h3>
-      <Persons persons={filteredView}></Persons>
+      <Persons persons={filteredView} handleRemoval={handleRemoval}></Persons>
     </div>
   )
 }
