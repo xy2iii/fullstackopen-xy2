@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/numbers'
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState('')
 
   const hook = () => {
     personService.getAll().then(data => {
@@ -28,6 +30,7 @@ const App = () => {
         `${newName} is already in phonebook, replace number?`
       )
 
+      // Replace it.
       if (replacePhoneNumber) {
         const oldPerson = persons.filter(p => p.name === newName)[0]
         const newPerson = {
@@ -43,6 +46,7 @@ const App = () => {
             const i = newPersons.findIndex(p => p.id === oldPerson.id)
             newPersons[i] = newPerson
             setPersons(newPersons)
+            setMessage(`Modified ${newPerson.name}'s number`)
           })
         return
       } else {
@@ -60,6 +64,7 @@ const App = () => {
       setPersons(persons.concat(data))
       setNewName('')
       setNewNumber('')
+      setMessage(`Added ${newPerson.name}`)
     })
   }
 
@@ -95,6 +100,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Filter filter={filter} handleChange={handleFilter}></Filter>
+      <Notification message={message}></Notification>
       <h3>Add a new</h3>
       <PersonForm
         newName={newName}
