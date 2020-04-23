@@ -10,7 +10,10 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [message, setMessage] = useState('')
+  const [notification, setNotification] = useState({
+    messsage: '',
+    status: 'success',
+  })
 
   const hook = () => {
     personService.getAll().then(data => {
@@ -40,14 +43,25 @@ const App = () => {
 
         personService
           .update(oldPerson.id, newPerson) // Server side.
-          .then(() => {
-            // Client side.
-            let newPersons = persons.slice()
-            const i = newPersons.findIndex(p => p.id === oldPerson.id)
-            newPersons[i] = newPerson
-            setPersons(newPersons)
-            setMessage(`Modified ${newPerson.name}'s number`)
-          })
+          .then(
+            () => {
+              // Client side.
+              let newPersons = persons.slice()
+              const i = newPersons.findIndex(p => p.id === oldPerson.id)
+              newPersons[i] = newPerson
+              setPersons(newPersons)
+              setNotification({
+                message: `Modified ${newPerson.name}'s number`,
+                status: 'success',
+              })
+            },
+            () => {
+              setNotification({
+                message: `${oldPerson.name} has already been removed from server`,
+                status: 'failure',
+              })
+            }
+          )
         return
       } else {
         // We don't replace the phone number, so exit.
@@ -64,7 +78,10 @@ const App = () => {
       setPersons(persons.concat(data))
       setNewName('')
       setNewNumber('')
-      setMessage(`Added ${newPerson.name}`)
+      setNotification({
+        message: `Added ${newPerson.name}`,
+        status: 'success',
+      })
     })
   }
 
@@ -100,7 +117,10 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Filter filter={filter} handleChange={handleFilter}></Filter>
-      <Notification message={message}></Notification>
+      <Notification
+        message={notification.message}
+        status={notification.status}
+      ></Notification>
       <h3>Add a new</h3>
       <PersonForm
         newName={newName}
